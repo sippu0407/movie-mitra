@@ -22,6 +22,12 @@ const userSchema = mongoose.Schema({
     required: true,
     default: false,
   },
+  role: {
+    type: String,
+    required: true,
+    default: "user",
+    enum: ["admin", "user"],
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -31,5 +37,10 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+userSchema.methods.comparePassword = async function (password) {
+  const result = await bcrypt.compare(password, this.password);
+  return result;
+};
 
 module.exports = mongoose.model("User", userSchema);
